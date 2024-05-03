@@ -1,26 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query,ValidationPipe} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
+  @Post('create')
   @HttpCode(204)
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Get('find-all')
+  findAll( @Query('search') search?: string, @Query('sort') sort?: string,@Query('direction') direction?: string,) {   
+    return this.usersService.findAll(search,sort,direction);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @Get(':user_id')
+  findOne(@Param('user_id') user_id: string) {
+    return this.usersService.findOne(+user_id);
   }
 
   @Patch(':id')
@@ -32,4 +33,10 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
+
+  @Post('login')
+  login(@Body(ValidationPipe) loginUserDto: LoginUserDto) {
+    return this.usersService.login(loginUserDto);
+  }
+
 }
