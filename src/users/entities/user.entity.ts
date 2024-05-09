@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn,OneToMany } from 'typeorm';
+import { Tracker } from 'src/tracker/entities/tracker.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -25,4 +26,7 @@ export class User {
 
   @Column()
   updatedAt: Date;
+
+  @OneToMany(() => Tracker, tracker => tracker.user)
+  trackers: Tracker[];
 }

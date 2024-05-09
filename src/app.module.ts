@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/entities/user.entity';
+import { Tracker } from './tracker/entities/tracker.entity';
+import { TrackerModule } from './tracker/tracker.module';
 
 
 
@@ -18,9 +20,10 @@ import { User } from './users/entities/user.entity';
       username: 'root',
       password: '',
       database: 'local_db',
-      entities: [User],
+      entities: [User,Tracker],
       synchronize: true,
     }),
+    TrackerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

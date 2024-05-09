@@ -9,9 +9,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('create')
-  @HttpCode(204)
+  @HttpCode(200)
   create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    return this.usersService.create(createUserDto)
+    .then(response => ({ message: response.response,statusCode:response.statusCode }))
+    .catch(error => ({ error: error.message }));
   }
 
   @Get('find-all')

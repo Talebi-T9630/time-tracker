@@ -1,8 +1,8 @@
 import {IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsString, IsStrongPassword,Validate } from 'class-validator';
-import { IsUsernameUniqueConstraint } from '../validator/username-unique.validator';
+
+
 export class CreateUserDto {
     @IsString()
-    // @Validate(IsUsernameUniqueConstraint)
     @IsNotEmpty({
         message:'username cannot be left empty'
     })

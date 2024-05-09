@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Controller, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository,EntityMetadata, getMetadataArgsStorage} from 'typeorm';
 import { User } from './entities/user.entity';
@@ -7,6 +7,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { createCipheriv, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
+import { NotFoundException } from '@nestjs/common';
+import { SMTPClient } from 'emailjs';
+
 
 @Injectable()
 export class UsersService {
@@ -15,18 +18,64 @@ export class UsersService {
     private usersRepository: Repository<User>
   ) {}
   async create(createUserDto: CreateUserDto) {
-    const password= await UsersService.passwordHash(createUserDto.user_password); 
-    const user =  this.usersRepository.create({
-      ...createUserDto,
-      user_password:password.toString(),
-      createdAt:Date(),
-    });
-
-    return this.usersRepository.save(user);
+      const password= await UsersService.passwordHash(createUserDto.user_password); 
+      const checkDuplicateEmailUsername= await this.checkDuplicateEmailUsername(createUserDto.username,createUserDto.user_email);
+      if(checkDuplicateEmailUsername===true){
+        const user =  this.usersRepository.create({
+          ...createUserDto,
+          user_password:password.toString(),
+          createdAt:Date(),
+        });
+    
+        await this.usersRepository.save(user);
+        return {response:'A confirmation Email has been sent to :'+user.user_email};
+      }else{
+        return {response:checkDuplicateEmailUsername,statusCode:404};
+      }
   }
+   
 
-  async findByUsername(username: string): Promise<User | undefined> {
-    return this.usersRepository.findOne({ where: { username } });
+
+  async checkDuplicateEmailUsername(username: string, user_email: string) {
+    try {
+      const existingUsername = await this.usersRepository.findOne({where: {username} });
+      if (existingUsername) {
+        throw new Error('This username already exists, please choose a new one.');
+      }
+  
+      const existingEmail = await this.usersRepository.findOne({ where: {user_email} });
+      if (existingEmail) {
+        throw new Error('This email is already in use, please use a different email.');
+      }
+  
+      return true;
+    } catch (error) {
+      throw new NotFoundException(error.message);
+    }
+  }
+  
+  static async confirmationEmail(email:string){
+    // const client = new SMTPClient({
+    //   user: 'user',
+    //   password: 'password',
+    //   host: 'smtp.your-email.com',
+    //   ssl: true,
+    // });
+    
+    // try {
+    //   const message = await client.sendAsync({
+    //     text: 'i hope this works',
+    //     from: 'talebitarane@gmail.com',
+    //     to: 'taranetalebi@yahoo.ca',
+    //     subject: 'testing emailjs',
+    //     attachment: [
+    //       { data: '<html>i <i>hope</i> this works!</html>', alternative: true },
+    //     ],
+    //   });
+    //   console.log(message);
+    // } catch (err) {
+    //   console.error(err);
+    // }
   }
 
 
