@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { TrackerService } from './tracker.service';
 import { CreateTrackerDto } from './dto/create-tracker.dto';
 import { UpdateTrackerDto } from './dto/update-tracker.dto';
@@ -13,10 +13,14 @@ export class TrackerController {
   }
 
   @Post('start-time')
-  createTracker(@Body() createTrackerDto: CreateTrackerDto) {
-    return this.trackerService.create(createTrackerDto);
+  createTracker(@Query('user_id') user_id: number, @Query('type') type: string) {
+    return this.trackerService.createTracker(user_id,type);
   }
 
+  @Get('get-tracker-list')
+  getTrackersByDate(@Query('userId') user_id: number, @Query('startOfDay') startOfDay: string, @Query('endOfDay') endOfDay: string) {
+    return this.trackerService.getTrackersByDate(startOfDay,endOfDay,user_id);
+  }
   @Get()
   findAll() {
     return this.trackerService.findAll();
