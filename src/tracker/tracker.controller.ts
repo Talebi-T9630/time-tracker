@@ -12,16 +12,15 @@ export class TrackerController {
     return this.trackerService.create(createTrackerDto);
   }
 
-  // @Post('start-time')
-  // createTracker(@Body() createTrackerDto: CreateTrackerDto) {
-  //   return this.trackerService.create(createTrackerDto);
-  // }
-
   @Post('start-time')
   createTracker(@Query('user_id') user_id: number, @Query('type') type: string) {
     return this.trackerService.createTracker(user_id,type);
   }
 
+  @Get('get-tracker-list')
+  getTrackersByDate(@Query('userId') user_id: number, @Query('startOfDay') startOfDay: string, @Query('endOfDay') endOfDay: string) {
+    return this.trackerService.getTrackersByDate(startOfDay,endOfDay,user_id);
+  }
   @Get()
   findAll() {
     return this.trackerService.findAll();

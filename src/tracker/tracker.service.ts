@@ -33,9 +33,6 @@ export class TrackerService {
     if (!user) {
       throw new Error(`User with id ${user_id} not found`);
     }
-    //2 more methods
-    // fetch tracking for day (public)
-    //fetch tracking for the week
     const tracker = new Tracker();
     if(type==="start"){
       tracker.start_time =  (Date.now()).toString();
@@ -51,6 +48,18 @@ export class TrackerService {
 
     return await this.trackerRepository.save(tracker);
   }
+
+  async getTrackersByDate(startOfDay:string,endOfDay:string, user_id:number): Promise<Tracker[]> {
+    console.log({startOfDay,endOfDay,user_id}); 
+    return await this.trackerRepository.createQueryBuilder('tracker')
+    .select(['tracker.start_time','tracker.stop_time','tracker.id'])
+    .where('tracker.user_id = :user_id', { user_id })
+    .andWhere('tracker.start_time >= :startOfDay AND tracker.start_time <= :endOfDay', { startOfDay, endOfDay })
+    .orWhere('tracker.stop_time >= :startOfDay AND tracker.stop_time <= :endOfDay', { startOfDay, endOfDay })
+    .orderBy('tracker.id', 'ASC')
+    .getMany();
+    }
+  
 
   findAll() {
     return `This action returns all tracker`;
