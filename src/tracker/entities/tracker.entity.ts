@@ -7,11 +7,11 @@ export class Tracker {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  start_time: EpochTimeStamp;
+  @Column({ nullable: true })
+  start_time: string;
 
-  @Column()
-  stop_time: EpochTimeStamp;
+  @Column({ nullable: true })
+  stop_time: string;
 
   @Column()
   createdAt: Date;

@@ -5,6 +5,7 @@ import { Tracker } from './entities/tracker.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository} from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
+import { error } from 'console';
 
 
 
@@ -26,15 +27,26 @@ export class TrackerService {
     return 'This action adds a new tracker';
   }
 
-  async createTracker(user_id: number, start_time: string, stop_time: string): Promise<Tracker> {
+  async createTracker(user_id: number,type:string): Promise<Tracker> {
     const user = await this.userRepository.findOne({where: {user_id}});
+    console.log(user);
     if (!user) {
       throw new Error(`User with id ${user_id} not found`);
     }
-
+    //2 more methods
+    // fetch tracking for day (public)
+    //fetch tracking for the week
     const tracker = new Tracker();
-    tracker.start_time = parseInt(start_time);
-    tracker.stop_time = parseInt(stop_time);
+    if(type==="start"){
+      tracker.start_time =  (Date.now()).toString();
+      tracker.stop_time =null;
+    }else if(type==="stop"){
+      tracker.stop_time =  (Date.now()).toString();
+      tracker.start_time =null;
+    }else{
+      throw error("Tracker type undifined");
+    }
+   
     tracker.user = user;
 
     return await this.trackerRepository.save(tracker);
